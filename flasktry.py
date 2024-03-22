@@ -21,9 +21,7 @@ def predict():
         width = img.shape[1]
         resizewidth = int(width*3/2)
         resizeheight = int(height*3/2)
-        #img = cv2.resize(img[:,:,0:3],(1000,1000), interpolation = cv2.INTER_AREA)
         cv2.namedWindow("img",cv2.WINDOW_NORMAL)
-        # cv2.setWindowProperty('img',cv2.WND_PROP_FULLSCREEN,cv2.cv.CV_WINDOW_FULLSCREEN)
         cv2.resizeWindow("img", (int(width*3/2), int(height*3/2)))
         gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
         faces=face_cascade.detectMultiScale(gray,1.3,5)
@@ -32,16 +30,16 @@ def predict():
             cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
             cv2.rectangle(img,(x+w+50,y+h),(x-50,y+h+400),(255,255,255),2)
 
-            #|||||||||||||SHIRT||||||||||||||||||||||||||||||||||||||||
+            #..................SHIRT...................
 
             shirtWidth =  3 * w  #approx wrt face width
             shirtHeight = shirtWidth * origshirtHeight / origshirtWidth #preserving aspect ratio of original image..
-            # Center the shirt..just random calculations..
+            # Center the shirt.
             x1s = x-w
             x2s =x1s+3*w
             y1s = y+h
             y2s = y1s+h*4
-            # Check for clipping(whetehr x1 is coming out to be negative or not..)
+            # Check for clipping(whether x1 is coming out to be negative or not..)
 
             if x1s < 0:
                 x1s = 0
@@ -54,36 +52,15 @@ def predict():
                 temp=y1s
                 y1s=y2s
                 y2s=temp
-            """
-            if y+h >=y1s:
-                y1s = 0
-                y2s=0
-            """
-            # Re-calculate the width and height of the shirt image(to resize the image when it wud be pasted)
+            
+            # Re-calculate the width and height of the shirt image(to resize the image when it would be pasted)
             shirtWidth = int(abs(x2s - x1s))
             shirtHeight = int(abs(y2s - y1s))
             y1s = int(y1s)
             y2s = int(y2s)
             x1s = int(x1s)
             x2s = int(x2s)
-            """
-            if not y1s == 0 and y2s == 0:
-                # Re-size the original image and the masks to the shirt sizes
-                shirt = cv2.resize(imgshirt, (shirtWidth,shirtHeight), interpolation = cv2.INTER_AREA) #resize all,the masks you made,the originla image,everything
-                mask = cv2.resize(orig_masks, (shirtWidth,shirtHeight), interpolation = cv2.INTER_AREA)
-                masks_inv = cv2.resize(orig_masks_inv, (shirtWidth,shirtHeight), interpolation = cv2.INTER_AREA)
-                # take ROI for shirt from background equal to size of shirt image
-                rois = img[y1s:y2s, x1s:x2s]
-                    # roi_bg contains the original image only where the shirt is not
-                    # in the region that is the size of the shirt.
-                num=rois
-                roi_bgs = cv2.bitwise_and(rois,num,mask = masks_inv)
-                # roi_fg contains the image of the shirt only where the shirt is
-                roi_fgs = cv2.bitwise_and(shirt,shirt,mask = mask)
-                # join the roi_bg and roi_fg
-                dsts = cv2.add(roi_bgs,roi_fgs)
-                img[y1s:y2s, x1s:x2s] = dsts # place the joined image, saved to dst back over the original image
-            """
+            
             # Re-size the original image and the masks to the shirt sizes
             shirt = cv2.resize(imgshirt, (shirtWidth,shirtHeight), interpolation = cv2.INTER_AREA) #resize all,the masks you made,the originla image,everything
             mask = cv2.resize(orig_masks, (shirtWidth,shirtHeight), interpolation = cv2.INTER_AREA)
