@@ -41,7 +41,7 @@ def predict(shirtno, pantno, base64Image):
     ih=shirtno
     i=pantno
     # while True:
-    imgarr=["./static/assets/shirt1.png",'./static/assets/shirt2.png','./static/assets/shirt51.jpg','./static/assets/shirt6.png']
+    imgarr=["./static/assets/shirt1.png",'./static/assets/shirt2.png','./static/assets/shirt51.jpg']
 
     #ih=input("Enter the shirt number you want to try")
     imgshirt = cv2.imread(imgarr[ih-1],1) #original img in bgr
@@ -289,10 +289,10 @@ def predict(shirtno, pantno, base64Image):
     return stringData
 
 @socketio.on('videoFrameRaw')
-def handleFromFromFe(data):
+def handleFromFromFe(data, shirtno, pantno):
     # print('received data: ' + str(data))
     
-    processedFrame = predict(1, 1, data)
+    processedFrame = predict(shirtno, pantno, data)
     
     emit('videoFrameProcessed', processedFrame)
 
