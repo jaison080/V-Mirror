@@ -1,5 +1,11 @@
+import CallToActionWithAnnotation from "../../components/Hero/Hero";
+import WithSubnavigation from "../../components/Navbar/Navbar";
+
 const HomePage = () => {
-  return <></>;
+  return <>
+  <WithSubnavigation/>
+  <CallToActionWithAnnotation/>
+  </>;
 };
 
 export default HomePage;
