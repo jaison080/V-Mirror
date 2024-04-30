@@ -6,6 +6,7 @@ import { io as socketIoClient } from 'socket.io-client';
 import { sessionMap } from './utils/sessionMap';
 import cors from 'cors';
 import { userRouter } from './routes/user';
+import { minioClient, region, screenshotBucket } from './utils/minio';
 
 dotenv.config();
 
@@ -78,6 +79,29 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use('/user', userRouter);
 
-server.listen(port, () => {
+server.listen(port, async () => {
+	const exists = await minioClient.bucketExists(screenshotBucket);
+	if (exists) {
+		console.log('Bucket ' + screenshotBucket + ' exists.');
+	} else {
+		await minioClient.makeBucket(screenshotBucket, region);
+		await minioClient.setBucketPolicy(
+			screenshotBucket,
+			JSON.stringify(publicReadPolicy)
+		);
+		console.log(`Bucket ${screenshotBucket} created successfully.`);
+	}
 	console.log(`[server]: Server is running at http://localhost:${port}`);
 });
+
+const publicReadPolicy = {
+	Version: '2012-10-17',
+	Statement: [
+		{
+			Effect: 'Allow',
+			Principal: '*',
+			Action: 's3:GetObject',
+			Resource: `arn:aws:s3:::${screenshotBucket}/*`,
+		},
+	],
+};

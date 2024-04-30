@@ -1,10 +1,10 @@
-version: "3.8"
+version: '3.8'
 
 services:
     streamer:
         build: ./streamer
         ports:
-            - "5000:5000"
+            - '5000:5000'
         volumes:
             - ./streamer/.venv:/app/.venv
 
@@ -17,8 +17,12 @@ services:
 
     core:
         build: ./core
+        depends_on:
+            - db
+            - minio
+            - streamer
         ports:
-            - "4000:4000"
+            - '4000:4000'
         volumes:
             - ./core/node_modules:/app/node_modules
         # command: sleep infinity
@@ -33,12 +37,36 @@ services:
             POSTGRES_PASSWORD: postgres
             POSTGRES_DB: postgres
         ports:
-            - "5432:5432"
+            - '5432:5432'
         volumes:
-            - ./db/data:/data/postgres
+            - dbData:/var/lib/postgresql/data
 
     adminer:
         image: adminer
         restart: always
         ports:
-        - 8080:8080
+            - 8080:8080
+
+    minio:
+        image: minio/minio
+        environment:
+            - MINIO_ROOT_USER=user
+            - MINIO_ROOT_PASSWORD=password
+            - MINIO_ACCESS_KEY=userAccess
+            - MINIO_SECRET_KEY=userPassword
+        volumes:
+            - minioData:/data
+        command: server data/minio --console-address :9090
+        ports:
+            - 9000:9000
+            - 9090:9090
+        healthcheck:
+            test:
+                ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
+            interval: 30s
+            timeout: 20s
+            retries: 3
+
+volumes:
+    dbData:
+    minioData:
