@@ -13,7 +13,7 @@ userRouter.post('/signup', SignupController);
 userRouter.post('/login', LoginController);
 
 userRouter.post(
-	'/upload',
+	'/screenshot',
 	multer({
 		storage: memoryStorage(),
 		limits: {
@@ -23,4 +23,4 @@ userRouter.post(
 	UploadScreenshotController
 );
 
-userRouter.get('/screenshots', GetScreenshotsController)
+userRouter.get('/screenshot', GetScreenshotsController)
