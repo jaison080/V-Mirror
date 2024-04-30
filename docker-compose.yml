@@ -21,4 +21,24 @@ services:
             - "4000:4000"
         volumes:
             - ./core/node_modules:/app/node_modules
-        command: ["npm", "run", "start"]
+        # command: sleep infinity
+        command: npm run start
+        env_file:
+            - ./core/.env
+
+    db:
+        image: postgres:alpine
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: postgres
+        ports:
+            - "5432:5432"
+        volumes:
+            - ./db/data:/data/postgres
+
+    adminer:
+        image: adminer
+        restart: always
+        ports:
+        - 8080:8080

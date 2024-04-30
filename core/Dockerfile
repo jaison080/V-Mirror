@@ -6,6 +6,7 @@ COPY package.json package-lock.json tsconfig.json ./
 
 RUN npm install
 
+COPY .env ./
 COPY src ./src
 
-CMD ["npm", "run", "dev"]
+RUN npm run build
