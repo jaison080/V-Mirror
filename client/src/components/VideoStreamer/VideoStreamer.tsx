@@ -5,7 +5,7 @@ import { ProductContextType } from "../../v-mirror.interfaces";
 import { useNavigate } from "react-router-dom";
 
 const URL =
-  process.env.NODE_ENV === "production" ? "" : "http://localhost:5000";
+  process.env.NODE_ENV === "production" ? "" : "http://localhost:4000";
 
 export const socket = io(URL, { autoConnect: false });
 
@@ -90,6 +90,7 @@ export default function VideoStreamer() {
   }
 
   function onDisconnect() {
+    console.log("Disconnected");
     setIsConnected(false);
   }
 
@@ -115,7 +116,7 @@ export default function VideoStreamer() {
     startStreaming();
     return () => {
       socket.off("connect", onConnect);
-      socket.off("disconnect", onDisconnect);
+      socket.disconnect();
       socket.off("videoFrameProcessed", onVideoFrameProcessed);
     };
   }, []);

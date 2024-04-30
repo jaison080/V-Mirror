@@ -289,14 +289,14 @@ def predict(shirtno, pantno, base64Image):
     return stringData
 
 @socketio.on('videoFrameRaw')
-def handleFromFromFe(data, shirtno, pantno):
-    # print('received data: ' + str(data))
+def handleFromFromFe(data, shirtno, pantno, sessionId):
+    # print('received data: ' + len(str(data)))
     
+    sessionIdStr = str(sessionId)
     processedFrame = predict(shirtno, pantno, data)
-    
-    emit('videoFrameProcessed', processedFrame)
+    emit('videoFrameProcessed', (processedFrame, sessionIdStr))
 
 if __name__ == '__main__':
     # app.run(host='0.0.0.0',debug=True,port=5000)
-    socketio.run(app, host='0.0.0.0',debug=True,port=5000)
+    socketio.run(app, host='0.0.0.0',debug=True,port=5000, allow_unsafe_werkzeug=True)
     
