@@ -11,6 +11,10 @@ const BASE_URL =
 export const socket = io(BASE_URL, { autoConnect: false });
 
 export default function VideoStreamer() {
+	const [streamVideoToServerTimer, setStreamVideoToServerTimer] = useState<
+		NodeJS.Timer | undefined
+	>(undefined);
+
 	const navigate = useNavigate();
 	const {
 		selectedPant,
@@ -42,8 +46,13 @@ export default function VideoStreamer() {
 		}
 
 		context.drawImage(video, 0, 0, canvas.width, canvas.height);
-		const data = canvas.toDataURL(imageType);
-
+		const data = canvas.toDataURL(imageType, 0.5);
+		// const base64Data = canvas.toDataURL(imageType, 0.5);
+		// const jpegData = canvas.toDataURL('image/jpeg', 0.5);
+		// console.log({
+		// 	base64Length: base64Data.length,
+		// 	jpegLength: jpegData.length,
+		// });
 		// console.log(data);
 
 		const base64Image = data.split(',')[1];
@@ -75,9 +84,11 @@ export default function VideoStreamer() {
 				video.srcObject = stream;
 			}
 
-			setInterval(() => {
-				streamVideoToServer();
-			}, 100);
+			setStreamVideoToServerTimer(
+				setInterval(() => {
+					streamVideoToServer();
+				}, 100)
+			);
 
 			setStream(stream);
 		} catch (err) {
@@ -119,6 +130,14 @@ export default function VideoStreamer() {
 			socket.off('connect', onConnect);
 			socket.disconnect();
 			socket.off('videoFrameProcessed', onVideoFrameProcessed);
+
+			try {
+				if (streamVideoToServerTimer) {
+					clearInterval(streamVideoToServerTimer);
+				}
+			} catch (err) {
+				console.log(err);
+			}
 		};
 	}, []);
 
@@ -248,9 +267,12 @@ export default function VideoStreamer() {
 					</div>
 
 					<div>
-						<button className='try_on_button' onClick={() => {
-              uploadScreenshot(jpegImageFrame);
-            }}>
+						<button
+							className='try_on_button'
+							onClick={() => {
+								uploadScreenshot(jpegImageFrame);
+							}}
+						>
 							Take Screenshot
 						</button>
 					</div>
@@ -272,17 +294,17 @@ async function uploadScreenshot(base64Image: string) {
 
 		formData.append('screenshot', fileBlob, 'screenshot.jpg');
 
-    // TODO: take from localStorage
-    const userName = '1@gmail.com';
-    const password = 'password'
+		// TODO: take from localStorage
+		const userName = '1@gmail.com';
+		const password = 'password';
 
-    const basicToken = btoa(`${userName}:${password}`);
+		const basicToken = btoa(`${userName}:${password}`);
 		const response = await axios.post(
 			`${BASE_URL}/user/screenshot`,
 			formData,
 			{
 				headers: {
-          'Authorization': `Basic ${basicToken}`,
+					Authorization: `Basic ${basicToken}`,
 					'Content-Type': 'multipart/form-data',
 				},
 			}
@@ -292,7 +314,6 @@ async function uploadScreenshot(base64Image: string) {
 		if (response.status === 200) {
 			alert('Screenshot saved successfully');
 		}
-
 	} catch (err) {
 		console.log(err);
 		alert('Failed to upload screenshot');
