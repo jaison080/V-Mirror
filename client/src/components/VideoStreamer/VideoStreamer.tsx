@@ -11,8 +11,13 @@ export const socket = io(URL, { autoConnect: false });
 
 export default function VideoStreamer() {
   const navigate = useNavigate();
-  const { selectedPant, selectedShirt, selectedSpec, shirts, pants }: ProductContextType =
-    useContext(ProductContext);
+  const {
+    selectedPant,
+    selectedShirt,
+    selectedSpec,
+    shirts,
+    pants,
+  }: ProductContextType = useContext(ProductContext);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isConnected, setIsConnected] = useState(socket.connected);
@@ -118,26 +123,19 @@ export default function VideoStreamer() {
   return (
     <div
       style={{
-        padding: "2rem",
+        padding: "1rem",
       }}
     >
+      {/* <button onClick={startStreaming}>Start</button>
+      <button onClick={stopStreaming}>Stop</button> */}
       <div
         style={{
           display: "flex",
           flexDirection: "row",
-          justifyContent: "space-between",
+          justifyContent: "flex-end",
           alignItems: "center",
         }}
       >
-        <div
-          style={{
-            fontFamily: "'Brush Script MT', cursive",
-            fontSize: "30px",
-            fontWeight: "800",
-          }}
-        >
-          V - Mirror
-        </div>
         <button
           className="try_on_button"
           onClick={() => {
@@ -148,15 +146,12 @@ export default function VideoStreamer() {
           View Items
         </button>
       </div>
-
-      {/* <button onClick={startStreaming}>Start</button>
-      <button onClick={stopStreaming}>Stop</button> */}
       <div
         style={{
           display: "flex",
           flexDirection: "row",
           justifyContent: "center",
-          gap:"8rem",
+          gap: "8rem",
           alignItems: "center",
         }}
       >
@@ -166,7 +161,7 @@ export default function VideoStreamer() {
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-            gap:"1rem"
+            gap: "1rem",
           }}
         >
           <div
@@ -175,7 +170,7 @@ export default function VideoStreamer() {
               flexDirection: "row",
               justifyContent: "space-between",
               paddingTop: "1rem",
-              height: "200px"
+              height: "200px",
             }}
           >
             <div>
@@ -196,7 +191,7 @@ export default function VideoStreamer() {
                 alt="Pant"
               />
             </div>
-            <div>
+            {/* <div>
               <img
                 src={selectedSpec.image}
                 style={{
@@ -204,7 +199,7 @@ export default function VideoStreamer() {
                 }}
                 alt="Spec"
               />
-            </div>
+            </div> */}
           </div>
           <div>
             <video
@@ -214,7 +209,7 @@ export default function VideoStreamer() {
               style={{
                 height: "400px",
                 borderRadius: "20px",
-                border: "3px solid #742e1f"
+                border: "3px solid #742e1f",
               }}
             ></video>
           </div>
@@ -224,15 +219,15 @@ export default function VideoStreamer() {
             display: "flex",
             flexDirection: "column",
             gap: "2rem",
-            alignItems:"center",
-            justifyContent:"center"
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
           <div
             style={{
               fontFamily: "'Courier New', monospace",
               fontSize: "30px",
-              fontWeight: "900"
+              fontWeight: "900",
             }}
           >
             Your Try-On
@@ -244,7 +239,7 @@ export default function VideoStreamer() {
                 borderRadius: "20px",
                 minHeight: "400px",
                 minWidth: "600px",
-                border: "3px solid #742e1f"
+                border: "3px solid #742e1f",
               }}
               src={`data:image/jpeg;base64,${jpegImageFrame}`}
             />
