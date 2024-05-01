@@ -8,7 +8,7 @@ from flask_socketio import SocketIO, emit
 from io import StringIO, BytesIO
 import base64
 from PIL import Image
-
+import  cvzone
 
 app = Flask(__name__)
 # CORS(app)
@@ -25,6 +25,13 @@ def predict(shirtno, pantno, base64Image, isShirtSelected, isPantSelected):
 
     ## converting RGB to BGR, as opencv standards
     img = cv2.cvtColor(np.array(pimg), cv2.COLOR_RGB2BGR)
+    
+    
+    # SPEC START
+    
+    specOverlay = cv2.imread('./static/assets/glasses/glass3.png', cv2.IMREAD_UNCHANGED)
+    # SPEC END
+    
     
     # cv2.waitKey(1)
     # cap=cv2.VideoCapture(0)
@@ -83,6 +90,16 @@ def predict(shirtno, pantno, base64Image, isShirtSelected, isPantSelected):
     faces=face_cascade.detectMultiScale(gray,1.3,5)
 
     for (x,y,w,h) in faces:
+        
+        
+        ##### SPEC START
+        
+        specOverlayResize = cv2.resize(specOverlay,(w,int(h*0.8)))
+        cvzone.overlayPNG(img, specOverlayResize, [x, y])
+        ##### SPEC END
+        
+        
+        
         cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
         cv2.rectangle(img,(100,200),(312,559),(255,255,255),2)
         pantWidth =  3 * w  #approx wrt face width
@@ -259,6 +276,8 @@ def predict(shirtno, pantno, base64Image, isShirtSelected, isPantSelected):
             dsts = cv2.add(roi_bgs,roi_fgs)
             img[y1s:y2s, x1s:x2s] = dsts # place the joined image, saved to dst back over the original image
         #print "blurring"
+        
+        
         
         break
         
