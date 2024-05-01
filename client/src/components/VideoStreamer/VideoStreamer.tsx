@@ -84,7 +84,7 @@ export default function VideoStreamer() {
       // socket.emit('videoFrameRaw', "TESTRAW");
       console.log("isShirtSelected : ",isShirtSelected);
       console.log("isPantSelected : ",isPantSelected);
-      socket.emit("videoFrameRaw", base64Image, shirtno, pantno, isShirtSelected, isPantSelected);
+      socket.emit("videoFrameRaw", base64Image, shirtno, pantno, 13, isShirtSelected, isPantSelected, true);
     }
   }
 

@@ -75,16 +75,20 @@ socketIoServer.on('connection', (socket) => {
 			base64Image: string,
 			shirtno: number,
 			pantno: number,
+			specNo: number,
 			isShirtSelected: boolean = true,
-			isPantSelected: boolean = false
+			isPantSelected: boolean = true,
+			isSpecSelected: boolean = true,
 		) => {
 			streamerSocket.emit(
 				'videoFrameRaw',
 				base64Image,
 				shirtno,
 				pantno,
+				specNo,
 				isShirtSelected,
 				isPantSelected,
+				isSpecSelected,
 				sessionId
 			);
 		}

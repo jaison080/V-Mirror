@@ -14,7 +14,7 @@ app = Flask(__name__)
 # CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-def predict(shirtno, pantno, base64Image, isShirtSelected, isPantSelected):
+def predict(shirtno, pantno, specNo,  base64Image, isShirtSelected, isPantSelected, isSpecSelected):
 
     sbuf = StringIO()
     sbuf.write(base64Image)
@@ -29,7 +29,7 @@ def predict(shirtno, pantno, base64Image, isShirtSelected, isPantSelected):
     
     # SPEC START
     
-    specOverlay = cv2.imread('./static/assets/glasses/glass3.png', cv2.IMREAD_UNCHANGED)
+    specOverlay = cv2.imread('./static/assets/glasses/glass{specNo}.png'.format(specNo=specNo), cv2.IMREAD_UNCHANGED)
     # SPEC END
     
     
@@ -94,8 +94,9 @@ def predict(shirtno, pantno, base64Image, isShirtSelected, isPantSelected):
         
         ##### SPEC START
         
-        specOverlayResize = cv2.resize(specOverlay,(w,int(h*0.8)))
-        cvzone.overlayPNG(img, specOverlayResize, [x, y])
+        if(isSpecSelected):
+            specOverlayResize = cv2.resize(specOverlay,(w,int(h*0.8)))
+            cvzone.overlayPNG(img, specOverlayResize, [x, y])
         ##### SPEC END
         
         
@@ -301,11 +302,11 @@ def predict(shirtno, pantno, base64Image, isShirtSelected, isPantSelected):
     return stringData
 
 @socketio.on('videoFrameRaw')
-def handleFromFromFe(data, shirtno, pantno, isShirtSelected, isPantSelected, sessionId):
+def handleFromFromFe(data, shirtno, pantno, specNo, isShirtSelected, isPantSelected, isSpecSelected, sessionId):
     # print('received data: ' + len(str(data)))
     
     sessionIdStr = str(sessionId)
-    processedFrame = predict(shirtno, pantno, data, isShirtSelected, isPantSelected)
+    processedFrame = predict(shirtno, pantno, specNo, data, isShirtSelected, isPantSelected, isSpecSelected)
     emit('videoFrameProcessed', (processedFrame, sessionIdStr))
 
 @socketio.on('PING')
