@@ -20,13 +20,24 @@ import WithSubnavigation from "../../components/Navbar/Navbar";
 import { UserContext } from "../../contexts/UserContext";
 
 export default function SignupCard() {
-  const { handleSignup } = useContext(UserContext);
+  const { handleSignup, handleToast } = useContext(UserContext);
 
   const [showPassword, setShowPassword] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const checkValidations = (): boolean => {
+    if (
+      email === "" ||
+      !email.includes("@") ||
+      password === "" ||
+      firstName === ""
+    )
+      return false;
+    return true;
+  };
 
   return (
     <>
@@ -110,11 +121,16 @@ export default function SignupCard() {
                     bg: "blue.500",
                   }}
                   onClick={() =>
-                    handleSignup({
-                      name: `${firstName} ${lastName}`,
-                      email,
-                      password,
-                    })
+                    checkValidations()
+                      ? handleSignup({
+                          name: `${firstName} ${lastName}`,
+                          email,
+                          password,
+                        })
+                      : handleToast({
+                          title: "Enter Valid Details",
+                          isError: true,
+                        })
                   }
                 >
                   Sign up
