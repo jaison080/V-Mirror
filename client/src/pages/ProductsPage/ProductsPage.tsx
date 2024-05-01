@@ -12,14 +12,17 @@ const ProductsPage = () => {
   const {
     shirts,
     pants,
-    // specs,
+    specs,
     selectShirt,
     selectPant,
+    selectSpec,
     isShirtSelected,
     setIsShirtSelected,
     isPantSelected,
     setIsPantSelected,
-  }: // selectSpec,
+    isSpecSelected,
+    setIsSpecSelected
+  }:
   ProductContextType = useContext(ProductContext);
 
   return (
@@ -89,7 +92,7 @@ const ProductsPage = () => {
                 justifyContent: "center",
                 alignItems: "center",
                 opacity: !isShirtSelected ? 0.5 : 1,
-                pointerEvents: !isShirtSelected? "none" : "auto"
+                pointerEvents: !isShirtSelected ? "none" : "auto",
               }}
             >
               {shirts.map((shirt: IProduct) => {
@@ -137,7 +140,7 @@ const ProductsPage = () => {
                 justifyContent: "center",
                 alignItems: "center",
                 opacity: !isPantSelected ? 0.5 : 1,
-                pointerEvents: !isPantSelected? "none" : "auto"
+                pointerEvents: !isPantSelected ? "none" : "auto",
               }}
             >
               {pants.map((pant: IProduct) => {
@@ -147,37 +150,48 @@ const ProductsPage = () => {
               })}
             </div>
           </div>
-          {/* <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "1rem",
-            alignItems: "center",
-          }}
-        >
-          <div
-            style={{
-              fontFamily: "'Courier New', monospace",
-              fontSize: "25px",
-              fontWeight: "800",
-            }}
-          >
-            Specs
-          </div>
           <div
             style={{
               display: "flex",
-              flexDirection: "row",
-              flexWrap: "wrap",
-              justifyContent: "center",
+              flexDirection: "column",
+              gap: "1rem",
               alignItems: "center",
             }}
           >
-            {specs.map((spec: IProduct) => {
-              return <Product product={spec} onSelect={selectSpec} />;
-            })}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                gap: "2rem",
+                alignItems: "center",
+              }}
+            >
+              <Heading fontSize={"4xl"} textAlign={"center"}>
+                Specs
+              </Heading>
+              <Checkbox
+                size="lg"
+                colorScheme="blue"
+                isChecked={isSpecSelected}
+                onChange={(e) => setIsSpecSelected(!isSpecSelected)}
+              />
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                flexWrap: "wrap",
+                justifyContent: "center",
+                alignItems: "center",
+                opacity: !isSpecSelected ? 0.5 : 1,
+                pointerEvents: !isSpecSelected ? "none" : "auto",
+              }}
+            >
+              {specs.map((spec: IProduct) => {
+                return <Product product={spec} onSelect={selectSpec} />;
+              })}
+            </div>
           </div>
-        </div> */}
         </div>
       </div>
     </>

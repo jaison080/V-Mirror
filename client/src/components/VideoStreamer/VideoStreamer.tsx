@@ -19,11 +19,13 @@ export default function VideoStreamer() {
   const {
     selectedPant,
     selectedShirt,
-    // selectedSpec,
+    selectedSpec,
     shirts,
     pants,
+    specs,
     isShirtSelected,
-    isPantSelected
+    isPantSelected,
+    isSpecSelected
   }: ProductContextType = useContext(ProductContext);
 
   const { uploadScreenshot } = useContext(UserContext);
@@ -79,12 +81,11 @@ export default function VideoStreamer() {
     // console.log(base64Image);
     const shirtno = shirts.indexOf(selectedShirt) + 1;
     const pantno = pants.indexOf(selectedPant) + 1;
+    const specno = specs.indexOf(selectedSpec) + 1;
 
     if (socket.connected) {
       // socket.emit('videoFrameRaw', "TESTRAW");
-      console.log("isShirtSelected : ",isShirtSelected);
-      console.log("isPantSelected : ",isPantSelected);
-      socket.emit("videoFrameRaw", base64Image, shirtno, pantno, 13, isShirtSelected, isPantSelected, true);
+      socket.emit("videoFrameRaw", base64Image, shirtno, pantno, specno, isShirtSelected, isPantSelected, isSpecSelected);
     }
   }
 
@@ -184,7 +185,7 @@ export default function VideoStreamer() {
           className="try_on_button"
           onClick={() => {
             stopStreaming();
-            navigate("/");
+            navigate("/products");
           }}
         >
           View Items
@@ -235,7 +236,7 @@ export default function VideoStreamer() {
                 alt="Pant"
               />
             </div>
-            {/* <div>
+            <div>
               <img
                 src={selectedSpec.image}
                 style={{
@@ -243,7 +244,7 @@ export default function VideoStreamer() {
                 }}
                 alt="Spec"
               />
-            </div> */}
+            </div>
           </div>
           <div>
             <video
