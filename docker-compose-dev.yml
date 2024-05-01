@@ -38,11 +38,20 @@ services:
         volumes:
             - dbdata:/var/lib/postgresql/data
 
-    adminer:
-        image: adminer
-        restart: always
+    # adminer:
+    #     image: adminer
+    #     restart: always
+    #     ports:
+    #     - 8080:8080
+
+    prisma-studio:
+        depends_on:
+            - db
+        build: 
+            context: ./core
+            dockerfile: prisma.Dockerfile
         ports:
-        - 8080:8080
+            - "5555:5555"
 
     minio:
         image: minio/minio

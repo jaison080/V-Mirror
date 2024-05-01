@@ -47,6 +47,15 @@ services:
         ports:
             - 8080:8080
 
+    prisma-studio:
+        depends_on:
+            - db
+        build: 
+            context: ./core
+            dockerfile: prisma.Dockerfile
+        ports:
+            - "5555:5555"
+
     minio:
         image: minio/minio
         environment:
