@@ -185,7 +185,7 @@ export default function VideoStreamer() {
           className="try_on_button"
           onClick={() => {
             stopStreaming();
-            navigate("/");
+            navigate("/products");
           }}
         >
           View Items
@@ -236,7 +236,7 @@ export default function VideoStreamer() {
                 alt="Pant"
               />
             </div>
-            {/* <div>
+            <div>
               <img
                 src={selectedSpec.image}
                 style={{
@@ -244,7 +244,7 @@ export default function VideoStreamer() {
                 }}
                 alt="Spec"
               />
-            </div> */}
+            </div>
           </div>
           <div>
             <video
