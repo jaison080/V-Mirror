@@ -19,7 +19,7 @@ export default function VideoStreamer() {
   const {
     selectedPant,
     selectedShirt,
-    selectedSpec,
+    // selectedSpec,
     shirts,
     pants,
   }: ProductContextType = useContext(ProductContext);
@@ -157,6 +157,7 @@ export default function VideoStreamer() {
         console.log(err);
       }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
