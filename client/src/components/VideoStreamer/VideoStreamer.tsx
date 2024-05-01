@@ -22,6 +22,8 @@ export default function VideoStreamer() {
     // selectedSpec,
     shirts,
     pants,
+    isShirtSelected,
+    isPantSelected
   }: ProductContextType = useContext(ProductContext);
 
   const { uploadScreenshot } = useContext(UserContext);
@@ -80,7 +82,9 @@ export default function VideoStreamer() {
 
     if (socket.connected) {
       // socket.emit('videoFrameRaw', "TESTRAW");
-      socket.emit("videoFrameRaw", base64Image, shirtno, pantno);
+      console.log("isShirtSelected : ",isShirtSelected);
+      console.log("isPantSelected : ",isPantSelected);
+      socket.emit("videoFrameRaw", base64Image, shirtno, pantno, isShirtSelected, isPantSelected);
     }
   }
 

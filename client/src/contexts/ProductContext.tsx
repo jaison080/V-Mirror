@@ -5,6 +5,10 @@ import { IProduct, ProductContextType } from "../v-mirror.interfaces";
 export const ProductContext = createContext<ProductContextType>({
   products: [],
   setProducts: () => {},
+  isShirtSelected: true,
+  setIsShirtSelected: () => {},
+  isPantSelected: true,
+  setIsPantSelected: () => {},
   shirts: [],
   pants: [],
   specs: [],
@@ -16,7 +20,7 @@ export const ProductContext = createContext<ProductContextType>({
     image: "",
     isNewProduct: false,
     originalPrice: 0,
-    offerPrice: 0
+    offerPrice: 0,
   },
   selectedPant: {
     id: 0,
@@ -25,7 +29,7 @@ export const ProductContext = createContext<ProductContextType>({
     image: "",
     isNewProduct: false,
     originalPrice: 0,
-    offerPrice: 0
+    offerPrice: 0,
   },
   selectedSpec: {
     id: 0,
@@ -34,7 +38,7 @@ export const ProductContext = createContext<ProductContextType>({
     image: "",
     isNewProduct: false,
     originalPrice: 0,
-    offerPrice: 0
+    offerPrice: 0,
   },
   selectShirt: () => {},
   selectPant: () => {},
@@ -54,6 +58,8 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({
   const [selectedShirt, setSelectedShirt] = useState<IProduct>(shirts[0]);
   const [selectedPant, setSelectedPant] = useState<IProduct>(pants[0]);
   const [selectedSpec, setSelectedSpec] = useState<IProduct>(specs[0]);
+  const [isShirtSelected, setIsShirtSelected] = useState(true);
+  const [isPantSelected, setIsPantSelected] = useState(true);
 
   const selectShirt = (shirt: IProduct) => setSelectedShirt(shirt);
   const selectPant = (pant: IProduct) => setSelectedPant(pant);
@@ -74,6 +80,10 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({
         selectShirt,
         selectPant,
         selectSpec,
+        isShirtSelected,
+        setIsShirtSelected,
+        isPantSelected,
+        setIsPantSelected
       }}
     >
       {children}

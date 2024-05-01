@@ -16,6 +16,10 @@ export interface IProductProps {
 export interface ProductContextType {
   products: IProduct[];
   setProducts: React.Dispatch<IProduct[]>;
+  isShirtSelected: boolean;
+  setIsShirtSelected: React.Dispatch<boolean>;
+  isPantSelected: boolean;
+  setIsPantSelected: React.Dispatch<boolean>;
   shirts: IProduct[];
   pants: IProduct[];
   specs: IProduct[];
