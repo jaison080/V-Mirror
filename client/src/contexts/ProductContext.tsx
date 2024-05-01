@@ -9,6 +9,8 @@ export const ProductContext = createContext<ProductContextType>({
   setIsShirtSelected: () => {},
   isPantSelected: true,
   setIsPantSelected: () => {},
+  isSpecSelected: true,
+  setIsSpecSelected: () => {},
   shirts: [],
   pants: [],
   specs: [],
@@ -60,6 +62,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({
   const [selectedSpec, setSelectedSpec] = useState<IProduct>(specs[0]);
   const [isShirtSelected, setIsShirtSelected] = useState(true);
   const [isPantSelected, setIsPantSelected] = useState(true);
+  const [isSpecSelected, setIsSpecSelected] = useState(true);
 
   const selectShirt = (shirt: IProduct) => setSelectedShirt(shirt);
   const selectPant = (pant: IProduct) => setSelectedPant(pant);
@@ -83,7 +86,9 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({
         isShirtSelected,
         setIsShirtSelected,
         isPantSelected,
-        setIsPantSelected
+        setIsPantSelected,
+        isSpecSelected,
+        setIsSpecSelected
       }}
     >
       {children}
