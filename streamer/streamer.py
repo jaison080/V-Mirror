@@ -289,6 +289,11 @@ def handleFromFromFe(data, shirtno, pantno, isShirtSelected, isPantSelected, ses
     processedFrame = predict(shirtno, pantno, data, isShirtSelected, isPantSelected)
     emit('videoFrameProcessed', (processedFrame, sessionIdStr))
 
+@socketio.on('PING')
+def handlerPing(sessionId):
+    print('PING received at streamer')
+    sessionIdStr = str(sessionId)
+    emit('PONG', sessionIdStr)
 if __name__ == '__main__':
     # app.run(host='0.0.0.0',debug=True,port=5000)
     socketio.run(app, host='0.0.0.0',debug=True,port=5000, allow_unsafe_werkzeug=True)

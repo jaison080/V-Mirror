@@ -49,6 +49,16 @@ streamerSocket.on(
 	}
 );
 
+streamerSocket.on('PONG', (sessionId: string) => {
+	const socket = sessionMap.get(sessionId);
+	if (socket) {
+		console.log(`[socket]: Recieved PONG from ${sessionId} at Core Server`);
+		socket.emit('PONG');
+	} else {
+		// console.log(`[socket]: SERVER could not find client ${sessionId}`);
+	}
+});
+
 socketIoServer.on('connection', (socket) => {
 	const sessionId = socket.id;
 	console.log(`[socket]: ${sessionId} connected`);
@@ -79,6 +89,11 @@ socketIoServer.on('connection', (socket) => {
 			);
 		}
 	);
+
+	socket.on('PING', () => {
+		console.log(`[socket]: ${sessionId} PING Reciever at Core Server`);
+		streamerSocket.emit('PING', sessionId);
+	});
 });
 
 app.get('/', (req: Request, res: Response) => {
