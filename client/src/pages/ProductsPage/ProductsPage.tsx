@@ -1,4 +1,4 @@
-import { Heading } from "@chakra-ui/react";
+import { Checkbox, Heading } from "@chakra-ui/react";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import WithSubnavigation from "../../components/Navbar/Navbar";
@@ -15,6 +15,10 @@ const ProductsPage = () => {
     // specs,
     selectShirt,
     selectPant,
+    isShirtSelected,
+    setIsShirtSelected,
+    isPantSelected,
+    setIsPantSelected,
   }: // selectSpec,
   ProductContextType = useContext(ProductContext);
 
@@ -59,9 +63,24 @@ const ProductsPage = () => {
               gap: "1rem",
             }}
           >
-            <Heading fontSize={"4xl"} textAlign={"center"}>
-              Shirts
-            </Heading>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                gap: "2rem",
+                alignItems: "center",
+              }}
+            >
+              <Heading fontSize={"4xl"} textAlign={"center"}>
+                Shirts
+              </Heading>
+              <Checkbox
+                size="lg"
+                colorScheme="blue"
+                isChecked={isShirtSelected}
+                onChange={(e) => setIsShirtSelected(!isShirtSelected)}
+              />
+            </div>
             <div
               style={{
                 display: "flex",
@@ -69,10 +88,18 @@ const ProductsPage = () => {
                 flexWrap: "wrap",
                 justifyContent: "center",
                 alignItems: "center",
+                opacity: !isShirtSelected ? 0.5 : 1,
+                pointerEvents: !isShirtSelected? "none" : "auto"
               }}
             >
               {shirts.map((shirt: IProduct) => {
-                return <Product product={shirt} onSelect={selectShirt} key = {shirt.id}/>;
+                return (
+                  <Product
+                    product={shirt}
+                    onSelect={selectShirt}
+                    key={shirt.id}
+                  />
+                );
               })}
             </div>
           </div>
@@ -84,9 +111,24 @@ const ProductsPage = () => {
               alignItems: "center",
             }}
           >
-            <Heading fontSize={"4xl"} textAlign={"center"}>
-              Pants
-            </Heading>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                gap: "2rem",
+                alignItems: "center",
+              }}
+            >
+              <Heading fontSize={"4xl"} textAlign={"center"}>
+                Pants
+              </Heading>
+              <Checkbox
+                size="lg"
+                colorScheme="blue"
+                isChecked={isPantSelected}
+                onChange={(e) => setIsPantSelected(!isPantSelected)}
+              />
+            </div>
             <div
               style={{
                 display: "flex",
@@ -94,6 +136,8 @@ const ProductsPage = () => {
                 flexWrap: "wrap",
                 justifyContent: "center",
                 alignItems: "center",
+                opacity: !isPantSelected ? 0.5 : 1,
+                pointerEvents: !isPantSelected? "none" : "auto"
               }}
             >
               {pants.map((pant: IProduct) => {
