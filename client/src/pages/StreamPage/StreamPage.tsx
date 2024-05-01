@@ -1,5 +1,5 @@
-import WithSubnavigation from "../components/Navbar/Navbar";
-import VideoStreamer from "../components/VideoStreamer/VideoStreamer";
+import WithSubnavigation from "../../components/Navbar/Navbar";
+import VideoStreamer from "../../components/VideoStreamer/VideoStreamer";
 
 const StreamPage = () => {
   return (

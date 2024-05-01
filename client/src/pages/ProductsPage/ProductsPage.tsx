@@ -72,7 +72,7 @@ const ProductsPage = () => {
               }}
             >
               {shirts.map((shirt: IProduct) => {
-                return <Product product={shirt} onSelect={selectShirt} />;
+                return <Product product={shirt} onSelect={selectShirt} key = {shirt.id}/>;
               })}
             </div>
           </div>
@@ -84,7 +84,7 @@ const ProductsPage = () => {
               alignItems: "center",
             }}
           >
-           <Heading fontSize={"4xl"} textAlign={"center"}>
+            <Heading fontSize={"4xl"} textAlign={"center"}>
               Pants
             </Heading>
             <div
@@ -97,7 +97,9 @@ const ProductsPage = () => {
               }}
             >
               {pants.map((pant: IProduct) => {
-                return <Product product={pant} onSelect={selectPant} />;
+                return (
+                  <Product product={pant} onSelect={selectPant} key={pant.id} />
+                );
               })}
             </div>
           </div>

@@ -9,8 +9,12 @@ import {
   createIcon,
   useColorModeValue,
 } from "@chakra-ui/react";
+import { useContext } from "react";
+import { UserContext } from "../../contexts/UserContext";
 
 export default function CallToActionWithAnnotation() {
+  const { isUserLoggedIn } = useContext(UserContext);
+
   return (
     <>
       <Container maxW={"3xl"}>
@@ -48,14 +52,14 @@ export default function CallToActionWithAnnotation() {
               rounded={"full"}
               px={6}
               bg={"blue.400"}
-              as={'a'}
-              href={"/login"}
+              as={"a"}
+              href={isUserLoggedIn() ? "/products" : "/login"}
               color={"white"}
               _hover={{
                 bg: "blue.500",
               }}
             >
-              Get Started
+              {isUserLoggedIn() ? "View Products" : "Get Started"}
             </Button>
             {/* <Button variant={'link'} colorScheme={'blue'} size={'sm'}>
               Learn more
