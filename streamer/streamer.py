@@ -14,16 +14,6 @@ app = Flask(__name__)
 # CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-# @app.route('/')
-# def index():
-#     return render_template('index.html')
-# @app.route('/shirt.html')
-# def plot():
-#     return render_template('shirt.html')
-# @app.route('/pant.html')
-# def ploty():
-#     return render_template('pant.html')
-@app.route('/predict', methods=['GET','POST'])
 def predict(shirtno, pantno, base64Image, isShirtSelected, isPantSelected):
 
     sbuf = StringIO()
@@ -98,7 +88,7 @@ def predict(shirtno, pantno, base64Image, isShirtSelected, isPantSelected):
         pantWidth =  3 * w  #approx wrt face width
         pantHeight = pantWidth * origpantHeight / origpantWidth #preserving aspect ratio of original image..
 
-        # Center the pant..just random calculations..
+        # Center the pant..just calculations..
         if i==1:
             x1 = x-w
             x2 =x1+3*w
