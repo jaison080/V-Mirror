@@ -15,11 +15,18 @@ import {
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import WithSubnavigation from "../../components/Navbar/Navbar";
+import { UserContext } from "../../contexts/UserContext";
 
 export default function SignupCard() {
+  const { handleSignup } = useContext(UserContext);
+
   const [showPassword, setShowPassword] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   return (
     <>
@@ -51,24 +58,36 @@ export default function SignupCard() {
                 <Box>
                   <FormControl id="firstName" isRequired>
                     <FormLabel>First Name</FormLabel>
-                    <Input type="text" />
+                    <Input
+                      type="text"
+                      onChange={(e) => setFirstName(e.target.value)}
+                    />
                   </FormControl>
                 </Box>
                 <Box>
                   <FormControl id="lastName">
                     <FormLabel>Last Name</FormLabel>
-                    <Input type="text" />
+                    <Input
+                      type="text"
+                      onChange={(e) => setLastName(e.target.value)}
+                    />
                   </FormControl>
                 </Box>
               </HStack>
               <FormControl id="email" isRequired>
                 <FormLabel>Email address</FormLabel>
-                <Input type="email" />
+                <Input
+                  type="email"
+                  onChange={(e) => setEmail(e.target.value)}
+                />
               </FormControl>
               <FormControl id="password" isRequired>
                 <FormLabel>Password</FormLabel>
                 <InputGroup>
-                  <Input type={showPassword ? "text" : "password"} />
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
                   <InputRightElement h={"full"}>
                     <Button
                       variant={"ghost"}
@@ -90,13 +109,23 @@ export default function SignupCard() {
                   _hover={{
                     bg: "blue.500",
                   }}
+                  onClick={() =>
+                    handleSignup({
+                      name: `${firstName} ${lastName}`,
+                      email,
+                      password,
+                    })
+                  }
                 >
                   Sign up
                 </Button>
               </Stack>
               <Stack pt={6}>
                 <Text align={"center"}>
-                  Already a user? <Link color={"blue.400"} href="/login">Login</Link>
+                  Already a user?{" "}
+                  <Link color={"blue.400"} href="/login">
+                    Login
+                  </Link>
                 </Text>
               </Stack>
             </Stack>

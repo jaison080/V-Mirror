@@ -13,6 +13,7 @@ import {
   useColorModeValue,
   useBreakpointValue,
   useDisclosure,
+  Avatar,
 } from "@chakra-ui/react";
 import {
   HamburgerIcon,
@@ -20,12 +21,17 @@ import {
   ChevronDownIcon,
   ChevronRightIcon,
 } from "@chakra-ui/icons";
+import { useContext } from "react";
+import { UserContext } from "../../contexts/UserContext";
 
 export default function WithSubnavigation() {
   const { isOpen, onToggle } = useDisclosure();
+  const { isUserLoggedIn, user, handleLogout } = useContext(UserContext);
 
+  const linkColor = useColorModeValue("gray.600", "gray.200");
+  const linkHoverColor = useColorModeValue("gray.800", "white");
   return (
-    <Box>
+    <Box position={"sticky"} top={0} width={"100%"} zIndex={100}>
       <Flex
         bg={useColorModeValue("white", "gray.800")}
         color={useColorModeValue("gray.600", "white")}
@@ -70,32 +76,68 @@ export default function WithSubnavigation() {
         <Stack
           flex={{ base: 1, md: 0 }}
           justify={"flex-end"}
+          align={"center"}
           direction={"row"}
           spacing={6}
         >
-          <Button
-            as={"a"}
-            fontSize={"sm"}
-            fontWeight={400}
-            variant={"link"}
-            href={"/login"}
-          >
-            Sign In
-          </Button>
-          <Button
-            as={"a"}
-            display={{ base: "none", md: "inline-flex" }}
-            fontSize={"sm"}
-            fontWeight={600}
-            href={"/signup"}
-            bg={"blue.400"}
-            color={"white"}
-            _hover={{
-              bg: "blue.500",
-            }}
-          >
-            Sign Up
-          </Button>
+          {isUserLoggedIn() ? (
+            <>
+              <Box
+                as="a"
+                p={2}
+                href={"/profile"}
+                fontSize={"sm"}
+                fontWeight={500}
+                color={linkColor}
+                _hover={{
+                  textDecoration: "none",
+                  color: linkHoverColor,
+                }}
+              >
+                Profile
+              </Box>
+              <Button
+                display={{ base: "none", md: "inline-flex" }}
+                fontSize={"sm"}
+                fontWeight={600}
+                onClick={handleLogout}
+                bg={"red.500"}
+                color={"white"}
+                _hover={{
+                  bg: "red.400",
+                }}
+              >
+                Logout
+              </Button>
+              <Avatar name={user?.name} />
+            </>
+          ) : (
+            <>
+              <Button
+                as={"a"}
+                fontSize={"sm"}
+                fontWeight={400}
+                variant={"link"}
+                href={"/login"}
+              >
+                Sign In
+              </Button>
+              <Button
+                as={"a"}
+                display={{ base: "none", md: "inline-flex" }}
+                fontSize={"sm"}
+                fontWeight={600}
+                href={"/signup"}
+                bg={"blue.400"}
+                color={"white"}
+                _hover={{
+                  bg: "blue.500",
+                }}
+              >
+                Sign Up
+              </Button>
+            </>
+          )}
         </Stack>
       </Flex>
 
@@ -299,10 +341,10 @@ const NAV_ITEMS: Array<NavItem> = [
   //     },
   //   ],
   // },
-  // {
-  //   label: "Learn Design",
-  //   href: "#",
-  // },
+  {
+    label: "View Products",
+    href: "/products",
+  },
   // {
   //   label: "Hire Designers",
   //   href: "#",

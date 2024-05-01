@@ -1,20 +1,30 @@
 import {
   Box,
   Button,
-  Checkbox,
   Flex,
   FormControl,
   FormLabel,
   Heading,
   Input,
+  Link,
   Stack,
   Text,
-  Link,
-  useColorModeValue,
+  useColorModeValue
 } from "@chakra-ui/react";
+import { useContext, useState } from "react";
 import WithSubnavigation from "../../components/Navbar/Navbar";
+import { UserContext } from "../../contexts/UserContext";
 
 export default function SimpleCard() {
+  const { handleLogin, handleToast } = useContext(UserContext);
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const checkValidations = (): boolean => {
+    if (email === "" || !email.includes("@") || password === "") return false;
+    return true;
+  };
   return (
     <>
       <WithSubnavigation />
@@ -40,36 +50,53 @@ export default function SimpleCard() {
             p={8}
           >
             <Stack spacing={4}>
-              <FormControl id="email">
+              <FormControl id="email" isRequired>
                 <FormLabel>Email address</FormLabel>
-                <Input type="email" />
+                <Input
+                  type="email"
+                  onChange={(e) => setEmail(e.target.value)}
+                />
               </FormControl>
-              <FormControl id="password">
+              <FormControl id="password" isRequired>
                 <FormLabel>Password</FormLabel>
-                <Input type="password" />
+                <Input
+                  type="password"
+                  onChange={(e) => setPassword(e.target.value)}
+                />
               </FormControl>
               <Stack spacing={10}>
-                <Stack
+                {/* <Stack
                   direction={{ base: "column", sm: "row" }}
                   align={"start"}
                   justify={"space-between"}
                 >
                   <Checkbox>Remember me</Checkbox>
                   <Text color={"blue.400"}>Forgot password?</Text>
-                </Stack>
+                </Stack> */}
                 <Button
                   bg={"blue.400"}
                   color={"white"}
                   _hover={{
                     bg: "blue.500",
                   }}
+                  onClick={() =>
+                    checkValidations()
+                      ? handleLogin({ email, password, name: "" })
+                      : handleToast({
+                          title: "Enter Valid Details",
+                          isError: true,
+                        })
+                  }
                 >
                   Sign in
                 </Button>
               </Stack>
               <Stack pt={6}>
                 <Text align={"center"}>
-                  Not a user? <Link color={"blue.400"} href="/signup">Sign Up</Link>
+                  Not a user?{" "}
+                  <Link color={"blue.400"} href="/signup">
+                    Sign Up
+                  </Link>
                 </Text>
               </Stack>
             </Stack>
