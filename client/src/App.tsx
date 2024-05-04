@@ -9,6 +9,7 @@ import SignupCard from "./pages/SignupPage/SignupPage";
 import StreamPage from "./pages/StreamPage/StreamPage";
 import ProfilePage from "./pages/ProfilePage/ProfilePage";
 import ProtectedRoute from "./utils/ProtectedRoute";
+import AddProductPage from "./pages/AddProductPage/AddProductPage";
 
 const App = () => {
   return (
@@ -25,6 +26,14 @@ const App = () => {
                 element={
                   <ProtectedRoute>
                     <ProductsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/products/add"
+                element={
+                  <ProtectedRoute>
+                    <AddProductPage />
                   </ProtectedRoute>
                 }
               />
