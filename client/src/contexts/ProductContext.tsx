@@ -1,6 +1,11 @@
-import { createContext, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import { PRODUCTS } from "../v-mirror.constants";
-import { IProduct, ProductContextType } from "../v-mirror.interfaces";
+import {
+  IAddProductForm,
+  IProduct,
+  ProductContextType,
+} from "../v-mirror.interfaces";
+import { UserContext } from "./UserContext";
 
 export const ProductContext = createContext<ProductContextType>({
   products: [],
@@ -45,12 +50,14 @@ export const ProductContext = createContext<ProductContextType>({
   selectShirt: () => {},
   selectPant: () => {},
   selectSpec: () => {},
+  addProduct: () => false,
 });
 
 export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const allProducts: IProduct[] = PRODUCTS;
+  const { handleToast } = useContext(UserContext);
 
   const shirts: IProduct[] = PRODUCTS.filter((product) => product.type === 0);
   const pants: IProduct[] = PRODUCTS.filter((product) => product.type === 1);
@@ -67,6 +74,15 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({
   const selectShirt = (shirt: IProduct) => setSelectedShirt(shirt);
   const selectPant = (pant: IProduct) => setSelectedPant(pant);
   const selectSpec = (spec: IProduct) => setSelectedSpec(spec);
+
+  const addProduct = (productData: Partial<IAddProductForm>) => {
+    console.log(productData);
+    handleToast({
+      title: "Product Added Successfully",
+      isError: false,
+    });
+    return true;
+  };
 
   return (
     <ProductContext.Provider
@@ -88,7 +104,8 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({
         isPantSelected,
         setIsPantSelected,
         isSpecSelected,
-        setIsSpecSelected
+        setIsSpecSelected,
+        addProduct,
       }}
     >
       {children}

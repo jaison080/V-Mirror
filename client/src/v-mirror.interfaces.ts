@@ -32,6 +32,7 @@ export interface ProductContextType {
   selectShirt: (shirt: IProduct) => void;
   selectPant: (pant: IProduct) => void;
   selectSpec: (spec: IProduct) => void;
+  addProduct: (productData: Partial<IAddProductForm>) => boolean;
 }
 
 export interface UserContextType {
@@ -65,4 +66,22 @@ export interface IScreenshot {
   filename: string;
   publicUrl: string;
   userId: number;
+}
+
+export interface IFormProps {
+  formData: Partial<IAddProductForm>;
+  setFormData: (
+    updateFunction: (
+      prevState: Partial<IAddProductForm>
+    ) => Partial<IAddProductForm>
+  ) => void;
+}
+
+export interface IAddProductForm {
+  name: string;
+  originalPrice: number;
+  type: number;
+  isNewProduct: boolean;
+  image?: File;
+  offerPrice: number;
 }
