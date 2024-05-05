@@ -3,17 +3,19 @@ import { prisma } from '../utils/prisma';
 import { minioClient, productBucket, publicBaseUrl } from '../utils/minio';
 
 type ProductCreateReq = {
-	product: {
-		id: number;
-		name: string;
-		type: number;
-		// fileName: `${ProductType.SHIRT}/1`,
-		originalPrice: number;
-		offerPrice: number;
-		isNewProduct: boolean;
-		// publicUrl: `${publicBaseUrl}/${productBucket}/${ProductType.SHIRT}/1`,
-		// createdAt: new Date(),
-	};
+	productData: string;
+};
+
+type productData = {
+	id: number;
+	name: string;
+	type: number;
+	// fileName: `${ProductType.SHIRT}/1`,
+	originalPrice: number;
+	offerPrice: number;
+	isNewProduct: boolean;
+	// publicUrl: `${publicBaseUrl}/${productBucket}/${ProductType.SHIRT}/1`,
+	// createdAt: new Date(),
 };
 
 export async function AddProductController(
@@ -23,7 +25,7 @@ export async function AddProductController(
 	try {
 		const productFile = req.file;
 		const { id, name, type, originalPrice, offerPrice, isNewProduct } =
-			req.body?.product;
+			JSON.parse(req.body?.productData) as productData;
 		if (
 			!id ||
 			!name ||
