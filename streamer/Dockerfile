@@ -18,5 +18,5 @@ COPY ./static /app/static
 
 WORKDIR /app
 
-CMD ["sleep", "infinity"]
-# CMD ["python3", "-u", "streamer.py"]
+# CMD ["sleep", "infinity"]
+CMD ["python3", "-u", "streamer.py"]
