@@ -17,4 +17,4 @@ COPY ./static /app/static
 
 WORKDIR /app
 
-CMD ["python3", "streamer.py"]
+CMD ["python3", "-u", "streamer.py"]

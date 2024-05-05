@@ -6,7 +6,12 @@ import { io as socketIoClient } from 'socket.io-client';
 import { sessionMap } from './utils/sessionMap';
 import cors from 'cors';
 import { userRouter } from './routes/user';
-import { minioClient, region, screenshotBucket } from './utils/minio';
+import {
+	minioClient,
+	productBucket,
+	region,
+	screenshotBucket,
+} from './utils/minio';
 
 dotenv.config();
 
@@ -78,7 +83,7 @@ socketIoServer.on('connection', (socket) => {
 			specNo: number,
 			isShirtSelected: boolean = true,
 			isPantSelected: boolean = true,
-			isSpecSelected: boolean = true,
+			isSpecSelected: boolean = true
 		) => {
 			streamerSocket.emit(
 				'videoFrameRaw',
@@ -107,28 +112,37 @@ app.get('/', (req: Request, res: Response) => {
 app.use('/user', userRouter);
 
 server.listen(port, async () => {
-	const exists = await minioClient.bucketExists(screenshotBucket);
-	if (exists) {
-		console.log('Bucket ' + screenshotBucket + ' exists.');
-	} else {
-		await minioClient.makeBucket(screenshotBucket, region);
-		await minioClient.setBucketPolicy(
-			screenshotBucket,
-			JSON.stringify(publicReadPolicy)
-		);
-		console.log(`Bucket ${screenshotBucket} created successfully.`);
-	}
+	await Promise.all([
+		initBucket(screenshotBucket),
+		initBucket(productBucket),
+	]);
 	console.log(`[server]: Server is running at http://localhost:${port}`);
 });
 
-const publicReadPolicy = {
-	Version: '2012-10-17',
-	Statement: [
-		{
-			Effect: 'Allow',
-			Principal: '*',
-			Action: 's3:GetObject',
-			Resource: `arn:aws:s3:::${screenshotBucket}/*`,
-		},
-	],
+const getPublicReadPolicy = (bucketName: string) => {
+	return {
+		Version: '2012-10-17',
+		Statement: [
+			{
+				Effect: 'Allow',
+				Principal: '*',
+				Action: 's3:GetObject',
+				Resource: `arn:aws:s3:::${bucketName}/*`,
+			},
+		],
+	};
 };
+
+async function initBucket(bucketName: string) {
+	const exists = await minioClient.bucketExists(bucketName);
+	if (exists) {
+		console.log('Bucket ' + bucketName + ' exists.');
+	} else {
+		await minioClient.makeBucket(bucketName, region);
+		await minioClient.setBucketPolicy(
+			bucketName,
+			JSON.stringify(getPublicReadPolicy(bucketName))
+		);
+		console.log(`Bucket ${bucketName} created successfully.`);
+	}
+}

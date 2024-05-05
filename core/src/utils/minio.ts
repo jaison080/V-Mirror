@@ -11,5 +11,7 @@ export const  minioClient = new Client({
 });
 
 export const screenshotBucket = "screenshots";
+export const productBucket = "products";
+
 export const region = "ap-south-1";
 export const publicBaseUrl = process.env.MINIO_S3_PUBLIC_BASE_URL!;

@@ -22,3 +22,24 @@ model Screenshots {
   userId   Int
   createdAt DateTime @default(now())
 }
+
+
+model Products {
+  name String
+  originalPrice Float
+  offerPrice Float
+  isNewProduct Boolean
+  createdAt DateTime @default(now())
+
+
+  // SHIRT = 0
+  // PANT = 1
+  // SPECS = 2
+  type Int
+  id Int
+  
+  fileName String
+  publicUrl String
+
+  @@id([type, id])
+}
