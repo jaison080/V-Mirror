@@ -12,6 +12,8 @@ import {
 	region,
 	screenshotBucket,
 } from './utils/minio';
+import { initProducts } from './utils/initProducts';
+import { productRouter } from './routes/product';
 
 dotenv.config();
 
@@ -110,12 +112,16 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.use('/user', userRouter);
+app.use('/products', productRouter);
 
 server.listen(port, async () => {
 	await Promise.all([
 		initBucket(screenshotBucket),
 		initBucket(productBucket),
 	]);
+
+	await initProducts();
+
 	console.log(`[server]: Server is running at http://localhost:${port}`);
 });
 

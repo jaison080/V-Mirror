@@ -9,9 +9,9 @@ from io import StringIO, BytesIO
 import base64
 from PIL import Image
 import  cvzone
+from minio import Minio
 
 # BGRA
-
 ALPHA_CHANNEL_IDX = 3
 
 app = Flask(__name__)
@@ -30,41 +30,28 @@ productPathMap = {
     PANT_TYPE: './static/assets/pants/{productNo}.png',
     SPEC_TYPE: './static/assets/specs/{productNo}.png'
 }
+minioUrl = 'localhost:9000'
+# minioUrl = 'minio:9000'
+minioClient = Minio(minioUrl,
+    access_key="user",
+    secret_key="password",
+    secure=False
+)
+
+def getMinioProduct(productType, productNo):
+    productBucket = 'products'
+    fileName = '{productType}/{productNo}'.format(productType=productType, productNo=productNo)
+    
+    try:
+        data = minioClient.get_object(productBucket, fileName)
+        return data.read()
+    except Exception as e:
+        print('Error while fetching product from minio', e)
+        return None
 
 # Format:
 # (ProductType, ProductNo) -> (ProductImage, ClothMask, NonClothMask)
 productMap = {}
-
-
-# def getShirt(shirtNo):
-#     if shirtNo in shirtMap:
-#         # print('Shirt found in cache')
-#         return shirtMap[shirtNo]
-#     else:
-#         shirtFilePath = './static/assets/shirts/shirt{shirtNo}.png'.format(shirtNo=shirtNo)
-#         shirtFile = cv2.imread(shirtFilePath, cv2.IMREAD_UNCHANGED)
-#         if shirtFile is None:
-#             # TODO: add minio
-#             return None
-        
-#         # print('Shirt found from local file')
-        
-#         # extract pixels which are non transparent
-#         clothPixels = shirtFile[:,:,ALPHA_CHANNEL_IDX] > 0
-        
-#         clothAreaMasked = np.zeros((shirtFile.shape[0], shirtFile.shape[1]), dtype=np.uint8)
-        
-#         clothAreaMasked[clothPixels] = 255
-#         nonClothAreaMasked = cv2.bitwise_not(clothAreaMasked)
-
-#         shirtFileWithoutAlpha = shirtFile[:,:,0:3]
-#         shirtMap[shirtNo] = (shirtFileWithoutAlpha, clothAreaMasked, nonClothAreaMasked)
-        
-#         # print('Shirt Shape:', shirtFile.shape)  
-#         # print('Masked Shape:', clothAreaMasked.shape)
-#         # print('Non Masked Shape:', nonClothAreaMasked.shape)
-        
-#         return shirtMap[shirtNo]
         
         
 def getProduct(productType, productNo):
@@ -77,8 +64,17 @@ def getProduct(productType, productNo):
         productFileLocalPath = productPathMap[productType].format(productNo=productNo)
         productImage = cv2.imread(productFileLocalPath, cv2.IMREAD_UNCHANGED)
         if productImage is None:
-            # TODO: add minio
-            return None
+            # We try getting it from minio
+            
+            productImage = getMinioProduct(productType, productNo)
+            
+            if productImage is None:
+                print('Product not found from Minio as well')
+                return None
+            
+            productImage = cv2.imdecode(np.frombuffer(productImage, np.uint8), cv2.IMREAD_UNCHANGED)
+            
+            
         
         # extract pixels which are non transparent
         clothPixels = productImage[:,:,ALPHA_CHANNEL_IDX] > 0
@@ -105,9 +101,11 @@ def getPant(pantNo):
     return getProduct(PANT_TYPE, pantNo)   
 
 def getShirt(shirtNo):
-    return getProduct(SHIRT_TYPE, shirtNo)   
+    return getProduct(SHIRT_TYPE, shirtNo)
 
-# imgarr=["./static/assets/shirt1.png",'./static/assets/shirt2.png','./static/assets/shirt51.png']
+def getSpec(specNo):
+    return getProduct(SPEC_TYPE, specNo)
+
     
 def predict(shirtNo, pantNo, specNo,  base64Image, isShirtSelected, isPantSelected, isSpecSelected):
 
@@ -120,13 +118,6 @@ def predict(shirtNo, pantNo, specNo,  base64Image, isShirtSelected, isPantSelect
 
     ## converting RGB to BGR, as opencv standards
     img = cv2.cvtColor(np.array(pimg), cv2.COLOR_RGB2BGR)
-    
-    
-    # SPEC START
-    
-    specOverlay = cv2.imread('./static/assets/specs/{specNo}.png'.format(specNo=specNo), cv2.IMREAD_UNCHANGED)
-    # SPEC END
-    
 
     
     # origshirtHeight, origshirtWidth = shirtImg.shape[:2]
@@ -145,29 +136,10 @@ def predict(shirtNo, pantNo, specNo,  base64Image, isShirtSelected, isPantSelect
     #     orig_mask_inv = cv2.bitwise_not(orig_mask)
     # origpantHeight, origpantWidth = imgpant.shape[:2]
     
-    
-    
+
     face_cascade=cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
-    
-    height = img.shape[0]
-    width = img.shape[1]
-    resizewidth = int(width*3/2)
-    resizeheight = int(height*3/2)
-    #img = cv2.resize(img[:,:,0:3],(1000,1000), interpolation = cv2.INTER_AREA)
-    
-    
-    
-    # cv2.namedWindow("img",cv2.WINDOW_NORMAL)
-    
-    
-    
-    
-    # cv2.setWindowProperty('img',cv2.WND_PROP_FULLSCREEN,cv2.cv.CV_WINDOW_FULLSCREEN)
-    # cv2.resizeWindow("img", (int(width*3/2), int(height*3/2)))
-    
-    
-    
+
     gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
     faces=face_cascade.detectMultiScale(gray,1.3,5)
     
@@ -179,25 +151,16 @@ def predict(shirtNo, pantNo, specNo,  base64Image, isShirtSelected, isPantSelect
     for (x,y,w,h) in faces:
         
         
-        ##### SPEC START
         
         if(isSpecSelected):
+            # specs are not dynamic right now
+            specOverlay = cv2.imread('./static/assets/specs/{specNo}.png'.format(specNo=specNo), cv2.IMREAD_UNCHANGED)
             specOverlayResize = cv2.resize(specOverlay,(w,int(h*0.8)))
             cvzone.overlayPNG(img, specOverlayResize, [x, y])
-        ##### SPEC END
         
         
         
-        # cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
-        # cv2.rectangle(img,(100,200),(312,559),(255,255,255),2)
-        
-        # pantWidth =  3 * w  #approx wrt face width
-        # pantHeight = pantWidth * origpantHeight / origpantWidth #preserving aspect ratio of original image..
-
-        # Center the pant..just calculations..
-
-        # Check for clipping(whetehr x1 is coming out to be negative or not..)
-       
+        cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)    
         
         if(isPantSelected):  
             
@@ -305,14 +268,13 @@ def predict(shirtNo, pantNo, specNo,  base64Image, isShirtSelected, isPantSelect
                 
                 img[pantYTop:pantYBottom, pantXLeft:pantXRight] = ROIJointOrigImageNPant
 
-#|||||||||||||||||||||||||||||||SHIRT||||||||||||||||||||||||||||||||||||||||
 
         if(isShirtSelected):
             
             shirtTuple = getShirt(shirtNo)
             if shirtTuple is None:
                 print('Shirt not found')
-                return None
+                return base64Image
             
             shirtImg = shirtTuple[0]
             shirtPixels = shirtTuple[1]
@@ -374,34 +336,18 @@ def predict(shirtNo, pantNo, specNo,  base64Image, isShirtSelected, isPantSelect
 
             ROIJointOrigImageNShirt = cv2.add(ROI_nonShirtArea,ROI_shirtArea)
             img[shirtYTop:shirtYBottom, shirtXLeft:shirtXRight] = ROIJointOrigImageNShirt # place the joined image, saved to dst back over the original image
-        #print "blurring"
-        
-        
+
+          
         
         break
         
-        # cv2.imshow("img",img)
-        #cv2.setMouseCallback('img',change_dress)
-        # if cv2.waitKey(100) == ord('q'):
-        #     break
-
-    # jpg_as_text = base64.b64encode(img)
-    # cap.release()                           # Destroys the cap object
-    # cv2.destroyAllWindows()                 # Destroys all the windows created by imshow
-
-    # return render_template('index.html')
 
     imgencode = cv2.imencode('.jpg', img)[1]
-    # base64 encode
     stringData = base64.b64encode(imgencode).decode('utf-8')
-    # b64_src = 'data:image/jpg;base64,'
-    # stringData = b64_src + stringData
-    
     return stringData
 
 @socketio.on('videoFrameRaw')
 def handleFromFromFe(data, shirtno, pantno, specNo, isShirtSelected, isPantSelected, isSpecSelected, sessionId):
-    # print('received data: ' + len(str(data)))
     
     sessionIdStr = str(sessionId)
     processedFrame = predict(shirtno, pantno, specNo, data, isShirtSelected, isPantSelected, isSpecSelected)
@@ -426,7 +372,7 @@ def manualRun():
         frameencode = cv2.imencode('.jpg', frame)[1]
         frameBase64 = base64.b64encode(frameencode).decode('utf-8')
         
-        base64FrameProcessed = predict(3, 2, 1, frameBase64, True, True, False)
+        base64FrameProcessed = predict(5, 2, 1, frameBase64, True, True, False)
         
         processedFrame = cv2.imdecode(np.frombuffer(base64.b64decode(base64FrameProcessed), np.uint8), cv2.IMREAD_COLOR)
         

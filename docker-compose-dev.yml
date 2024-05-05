@@ -26,6 +26,8 @@ services:
         volumes:
             - ./core:/app
         command: ["npm", "run", "dev"]
+        # command: ["sleep", "infinity"]
+        # command: ["npm", "run", "migrate:dev"]
 
     db:
         image: postgres:alpine
