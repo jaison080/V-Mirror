@@ -7,7 +7,7 @@ type ProductCreateReq = {
 };
 
 type productData = {
-	id: number;
+	// id: number;
 	name: string;
 	type: number;
 	// fileName: `${ProductType.SHIRT}/1`,
@@ -24,10 +24,9 @@ export async function AddProductController(
 ) {
 	try {
 		const productFile = req.file;
-		const { id, name, type, originalPrice, offerPrice, isNewProduct } =
+		const { name, type, originalPrice, offerPrice, isNewProduct } =
 			JSON.parse(req.body?.productData) as productData;
 		if (
-			!id ||
 			!name ||
 			!type ||
 			!originalPrice ||
@@ -79,26 +78,37 @@ export async function AddProductController(
 		const fileBuffer = productFile.buffer;
 		const mimeType = productFile.mimetype;
 
-		const fileName = `${type}/${id}`;
-		const publicUrl = `${publicBaseUrl}/${productBucket}/${type}/${id}`;
-
-		const alreadyExists = await prisma.products.findFirst({
+		const highestIdOfProduct = await prisma.products.findFirst({
 			where: {
-				id: id,
 				type: type,
+			},
+			orderBy: {
+				id: 'desc',
 			},
 		});
 
-		if (alreadyExists) {
-			return res.status(400).send({
-				message: 'Product already exists',
-				success: false,
-			});
-		}
+		const newId = (highestIdOfProduct?.id ?? 0) + 1;
+
+		const fileName = `${type}/${newId}`;
+		const publicUrl = `${publicBaseUrl}/${productBucket}/${type}/${newId}`;
+
+		// const alreadyExists = await prisma.products.findFirst({
+		// 	where: {
+		// 		id: id,
+		// 		type: type,
+		// 	},
+		// });
+
+		// if (alreadyExists) {
+		// 	return res.status(400).send({
+		// 		message: 'Product already exists',
+		// 		success: false,
+		// 	});
+		// }
 
 		const newProduct = await prisma.products.create({
 			data: {
-				id,
+				id: newId,
 				name,
 				type,
 				originalPrice,
