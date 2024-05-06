@@ -80,7 +80,7 @@ export interface IFormProps {
 export interface IAddProductForm {
   name: string;
   originalPrice: string;
-  type: number;
+  type: string;
   isNewProduct: boolean;
   image?: File;
   offerPrice: string;

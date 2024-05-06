@@ -100,9 +100,9 @@ const Form1 = ({ formData, setFormData }: IFormProps) => {
           defaultValue={formData?.type}
           onChange={handleChange}
         >
-          <option value={1}>Shirt</option>
-          <option value={2}>Pant</option>
-          <option value={3}>Glasses</option>
+          <option value={"1"}>Shirt</option>
+          <option value={"2"}>Pant</option>
+          <option value={"3"}>Glasses</option>
         </Select>
       </FormControl>
       <FormControl isRequired mt="2%">
@@ -235,24 +235,25 @@ const AddProductPage = () => {
   const [formData, setFormData] = useState<Partial<IAddProductForm>>({
     name: "",
     originalPrice: "0",
-    type: 1,
+    type: "1",
     isNewProduct: false,
     offerPrice: "0",
   });
 
-  const handleSubmit = (formData: Partial<IAddProductForm>) => {
-    const successResponse = addProduct(formData);
+  const handleSubmit = async (formData: Partial<IAddProductForm>) => {
+    const successResponse = await addProduct(formData);
     if (!successResponse) {
       return;
     }
     setFormData({
       name: "",
       originalPrice: "0",
-      type: 1,
+      type: "1",
       isNewProduct: false,
       offerPrice: "0",
     });
     setStep(1);
+    setProgress(50);
   };
 
   return (

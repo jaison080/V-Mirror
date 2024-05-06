@@ -126,7 +126,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({
       JSON.stringify({
         name: productData.name,
         originalPrice: parseInt(productData.originalPrice as string),
-        type: productData.type,
+        type: parseInt(productData.type as string),
         isNewProduct: productData.isNewProduct,
         offerPrice: parseInt(productData.offerPrice as string),
       })
