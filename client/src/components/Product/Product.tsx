@@ -13,9 +13,9 @@ function Product({ product, onSelect }: IProductProps) {
 
   const isSelectedProduct = (product: IProduct): boolean => {
     return (
-      selectedPant.id === product.id ||
-      selectedShirt.id === product.id ||
-      selectedSpec.id === product.id
+      (selectedPant?.id === product.id && product.type === 2) ||
+      (selectedShirt?.id === product.id && product.type === 1) ||
+      (selectedSpec?.id === product.id && product.type === 3)
     );
   };
 
@@ -29,7 +29,7 @@ function Product({ product, onSelect }: IProductProps) {
     <div className="product-card spacing">
       {product.isNewProduct && <div className="badge">New Product</div>}
       <div className="product-thumb">
-        <img src={product.image} alt={product.name} />
+        <img src={product.publicUrl} alt={product.name} />
       </div>
       <div className="product-details">
         <h4>
