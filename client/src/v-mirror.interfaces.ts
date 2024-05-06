@@ -2,7 +2,7 @@ export interface IProduct {
   id: number;
   name: string;
   type: number;
-  image: string;
+  publicUrl: string;
   isNewProduct: boolean;
   originalPrice: number;
   offerPrice: number;
@@ -26,13 +26,13 @@ export interface ProductContextType {
   pants: IProduct[];
   specs: IProduct[];
   allProducts: IProduct[];
-  selectedShirt: IProduct;
-  selectedPant: IProduct;
-  selectedSpec: IProduct;
+  selectedShirt?: IProduct;
+  selectedPant?: IProduct;
+  selectedSpec?: IProduct;
   selectShirt: (shirt: IProduct) => void;
   selectPant: (pant: IProduct) => void;
   selectSpec: (spec: IProduct) => void;
-  addProduct: (productData: Partial<IAddProductForm>) => boolean;
+  addProduct: (productData: Partial<IAddProductForm>) => Promise<boolean>;
 }
 
 export interface UserContextType {
@@ -79,9 +79,9 @@ export interface IFormProps {
 
 export interface IAddProductForm {
   name: string;
-  originalPrice: number;
+  originalPrice: string;
   type: number;
   isNewProduct: boolean;
   image?: File;
-  offerPrice: number;
+  offerPrice: string;
 }

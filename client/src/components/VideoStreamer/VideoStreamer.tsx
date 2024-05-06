@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import { ProductContext } from "../../contexts/ProductContext";
 import { UserContext } from "../../contexts/UserContext";
-import { ProductContextType } from "../../v-mirror.interfaces";
+import { IProduct, ProductContextType } from "../../v-mirror.interfaces";
 
 const BASE_URL =
   process.env.NODE_ENV === "production" ? "" : "http://localhost:4000";
@@ -79,9 +79,9 @@ export default function VideoStreamer() {
 
     const base64Image = data.split(",")[1];
     // console.log(base64Image);
-    const shirtno = shirts.indexOf(selectedShirt) + 1;
-    const pantno = pants.indexOf(selectedPant) + 1;
-    const specno = specs.indexOf(selectedSpec) + 1;
+    const shirtno = shirts.indexOf(selectedShirt as IProduct) + 1;
+    const pantno = pants.indexOf(selectedPant as IProduct) + 1;
+    const specno = specs.indexOf(selectedSpec as IProduct) + 1;
 
     if (socket.connected) {
       // socket.emit('videoFrameRaw', "TESTRAW");
@@ -220,7 +220,7 @@ export default function VideoStreamer() {
           >
             <div>
               <img
-                src={selectedShirt.image}
+                src={selectedShirt?.publicUrl}
                 style={{
                   height: "200px",
                 }}
@@ -229,7 +229,7 @@ export default function VideoStreamer() {
             </div>
             <div>
               <img
-                src={selectedPant.image}
+                src={selectedPant?.publicUrl}
                 style={{
                   height: "200px",
                 }}
@@ -238,7 +238,7 @@ export default function VideoStreamer() {
             </div>
             <div>
               <img
-                src={selectedSpec.image}
+                src={selectedSpec?.publicUrl}
                 style={{
                   height: "200px",
                 }}

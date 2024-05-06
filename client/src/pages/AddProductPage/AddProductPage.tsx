@@ -1,26 +1,26 @@
 import { UploadOutlined } from "@ant-design/icons";
 import {
-    Box,
-    Button,
-    ButtonGroup,
-    Flex,
-    FormControl,
-    FormLabel,
-    GridItem,
-    Heading,
-    Input,
-    InputGroup,
-    InputLeftElement,
-    Progress,
-    Select,
-    Switch
+  Box,
+  Button,
+  ButtonGroup,
+  Flex,
+  FormControl,
+  FormLabel,
+  GridItem,
+  Heading,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  Progress,
+  Select,
+  Switch,
 } from "@chakra-ui/react";
 import {
-    Button as AntdButton,
-    Upload,
-    UploadFile,
-    UploadProps,
-    message,
+  Button as AntdButton,
+  Upload,
+  UploadFile,
+  UploadProps,
+  message,
 } from "antd";
 import { useContext, useState } from "react";
 import WithSubnavigation from "../../components/Navbar/Navbar";
@@ -100,9 +100,9 @@ const Form1 = ({ formData, setFormData }: IFormProps) => {
           defaultValue={formData?.type}
           onChange={handleChange}
         >
-          <option value={0}>Shirt</option>
-          <option value={1}>Pant</option>
-          <option value={2}>Glasses</option>
+          <option value={1}>Shirt</option>
+          <option value={2}>Pant</option>
+          <option value={3}>Glasses</option>
         </Select>
       </FormControl>
       <FormControl isRequired mt="2%">
@@ -234,10 +234,10 @@ const AddProductPage = () => {
   const [progress, setProgress] = useState(50);
   const [formData, setFormData] = useState<Partial<IAddProductForm>>({
     name: "",
-    originalPrice: 0,
-    type: 0,
+    originalPrice: "0",
+    type: 1,
     isNewProduct: false,
-    offerPrice: 0,
+    offerPrice: "0",
   });
 
   const handleSubmit = (formData: Partial<IAddProductForm>) => {
@@ -247,10 +247,10 @@ const AddProductPage = () => {
     }
     setFormData({
       name: "",
-      originalPrice: 0,
-      type: 0,
+      originalPrice: "0",
+      type: 1,
       isNewProduct: false,
-      offerPrice: 0,
+      offerPrice: "0",
     });
     setStep(1);
   };

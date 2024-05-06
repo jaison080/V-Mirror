@@ -21,9 +21,8 @@ const ProductsPage = () => {
     isPantSelected,
     setIsPantSelected,
     isSpecSelected,
-    setIsSpecSelected
-  }:
-  ProductContextType = useContext(ProductContext);
+    setIsSpecSelected,
+  }: ProductContextType = useContext(ProductContext);
 
   return (
     <>
@@ -188,7 +187,9 @@ const ProductsPage = () => {
               }}
             >
               {specs.map((spec: IProduct) => {
-                return <Product product={spec} onSelect={selectSpec} />;
+                return (
+                  <Product product={spec} onSelect={selectSpec} key={spec.id} />
+                );
               })}
             </div>
           </div>
