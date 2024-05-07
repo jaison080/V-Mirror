@@ -4,6 +4,7 @@ import { io } from "socket.io-client";
 import { ProductContext } from "../../contexts/ProductContext";
 import { UserContext } from "../../contexts/UserContext";
 import { IProduct, ProductContextType } from "../../v-mirror.interfaces";
+import { Switch } from "@chakra-ui/react";
 
 const BASE_URL =
   process.env.NODE_ENV === "production" ? "" : "http://localhost:4000";
@@ -14,6 +15,7 @@ export default function VideoStreamer() {
   const [streamVideoToServerTimer, setStreamVideoToServerTimer] = useState<
     NodeJS.Timer | undefined
   >(undefined);
+  const [showSkeleton, setShowSkeleton] = useState<boolean>(true);
 
   const navigate = useNavigate();
   const {
@@ -25,7 +27,7 @@ export default function VideoStreamer() {
     specs,
     isShirtSelected,
     isPantSelected,
-    isSpecSelected
+    isSpecSelected,
   }: ProductContextType = useContext(ProductContext);
 
   const { uploadScreenshot } = useContext(UserContext);
@@ -85,7 +87,17 @@ export default function VideoStreamer() {
 
     if (socket.connected) {
       // socket.emit('videoFrameRaw', "TESTRAW");
-      socket.emit("videoFrameRaw", base64Image, shirtno, pantno, specno, isShirtSelected, isPantSelected, isSpecSelected);
+      socket.emit(
+        "videoFrameRaw",
+        base64Image,
+        shirtno,
+        pantno,
+        specno,
+        isShirtSelected,
+        isPantSelected,
+        isSpecSelected,
+        showSkeleton
+      );
     }
   }
 
@@ -162,7 +174,7 @@ export default function VideoStreamer() {
         console.log(err);
       }
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -268,6 +280,26 @@ export default function VideoStreamer() {
             justifyContent: "center",
           }}
         >
+          <div>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                gap: "1rem",
+                alignItems: "center",
+                fontSize: "16px",
+                fontWeight: "500",
+              }}
+            >
+              Show Skeleton
+              <Switch
+                size="lg"
+                colorScheme="blue"
+                isChecked={showSkeleton}
+                onChange={() => setShowSkeleton(!showSkeleton)}
+              />
+            </div>
+          </div>
           <div
             style={{
               fontFamily: "'Courier New', monospace",
