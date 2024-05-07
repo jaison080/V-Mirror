@@ -31,8 +31,8 @@ productPathMap = {
     PANT_TYPE: './static/assets/pants/{productNo}.png',
     SPEC_TYPE: './static/assets/specs/{productNo}.png'
 }
-minioUrl = 'localhost:9000'
-# minioUrl = 'minio:9000'
+# minioUrl = 'localhost:9000'
+minioUrl = 'minio:9000'
 minioClient = Minio(minioUrl,
     access_key="user",
     secret_key="password",
@@ -110,7 +110,7 @@ def getSpec(specNo):
     return getProduct(SPEC_TYPE, specNo)
 
     
-def predict(shirtNo, pantNo, specNo,  base64Image, isShirtSelected, isPantSelected, isSpecSelected):
+def predict(shirtNo, pantNo, specNo,  base64Image, isShirtSelected, isPantSelected, isSpecSelected, isSkeletonShown):
 
     try:
         sbuf = StringIO()
@@ -183,7 +183,8 @@ def predict(shirtNo, pantNo, specNo,  base64Image, isShirtSelected, isPantSelect
         
         for (x,y,w,h) in faces:
             
-            cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)    
+            if(isSkeletonShown):
+                cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)    
             
             faceBottomY = y+h
             topMostShoulderY = min(left_shoulder[1], right_shoulder[1])
@@ -408,41 +409,33 @@ def predict(shirtNo, pantNo, specNo,  base64Image, isShirtSelected, isPantSelect
             break
             
 
-        
-        for connection in mpConnections:
-            start_point = (int(landmarks[connection[0]].x * rgbImg.shape[1]),
-                        int(landmarks[connection[0]].y * rgbImg.shape[0]))
-            end_point = (int(landmarks[connection[1]].x * rgbImg.shape[1]),
-                        int(landmarks[connection[1]].y * rgbImg.shape[0]))
-            cv2.line(img, start_point, end_point, (0, 255, 0), 2)
+        if(isSkeletonShown):
+            for connection in mpConnections:
+                start_point = (int(landmarks[connection[0]].x * rgbImg.shape[1]),
+                            int(landmarks[connection[0]].y * rgbImg.shape[0]))
+                end_point = (int(landmarks[connection[1]].x * rgbImg.shape[1]),
+                            int(landmarks[connection[1]].y * rgbImg.shape[0]))
+                cv2.line(img, start_point, end_point, (0, 255, 0), 2)
+                
             
-            
-        cv2.circle(img, right_shoulder, 5, (0, 0, 255), -1)
-        cv2.circle(img, left_shoulder, 5, (0, 0, 255), -1)
-        cv2.circle(img, left_hip, 5, (0, 0, 255), -1)
-        cv2.circle(img, right_hip, 5, (0, 0, 255), -1)
-        
-        # upperBodyHeight = max(abs(left_shoulder[1] - left_hip[1]), abs(right_shoulder[1] - right_hip[1]))
-        # upperBodyWidth = max(abs(left_shoulder[0] - right_shoulder[0]), abs(left_hip[0] - right_hip[0]))
-        
-        # draw upperBody bounding box
-        
-        # draw rectangle
-        cv2.rectangle(img, (leastLeft, leastTop), (maxRight, maxBottom), (0, 0, 255), 2)
+            cv2.circle(img, right_shoulder, 5, (0, 0, 255), -1)
+            cv2.circle(img, left_shoulder, 5, (0, 0, 255), -1)
+            cv2.circle(img, left_hip, 5, (0, 0, 255), -1)
+            cv2.circle(img, right_hip, 5, (0, 0, 255), -1)
         
             
         imgencode = cv2.imencode('.jpg', img)[1]
         stringData = base64.b64encode(imgencode).decode('utf-8')
         return stringData
     except Exception as e:
-        print('Error in prediction', e)
+        print('Error in prediction')
         return base64Image
 
 @socketio.on('videoFrameRaw')
-def handleFromFromFe(data, shirtno, pantno, specNo, isShirtSelected, isPantSelected, isSpecSelected, sessionId):
+def handleFromFromFe(data, shirtno, pantno, specNo, isShirtSelected, isPantSelected, isSpecSelected, isSkeletonShown, sessionId):
     
     sessionIdStr = str(sessionId)
-    processedFrame = predict(shirtno, pantno, specNo, data, isShirtSelected, isPantSelected, isSpecSelected)
+    processedFrame = predict(shirtno, pantno, specNo, data, isShirtSelected, isPantSelected, isSpecSelected, isSkeletonShown)
     emit('videoFrameProcessed', (processedFrame, sessionIdStr))
 
 @socketio.on('PING')
@@ -464,7 +457,7 @@ def manualRun():
         frameencode = cv2.imencode('.jpg', frame)[1]
         frameBase64 = base64.b64encode(frameencode).decode('utf-8')
         
-        base64FrameProcessed = predict(1, 2, 1, frameBase64, True, True, False)
+        base64FrameProcessed = predict(1, 2, 1, frameBase64, True, True, False, False)
         
         processedFrame = cv2.imdecode(np.frombuffer(base64.b64decode(base64FrameProcessed), np.uint8), cv2.IMREAD_COLOR)
         

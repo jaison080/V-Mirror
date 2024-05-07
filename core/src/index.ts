@@ -85,7 +85,8 @@ socketIoServer.on('connection', (socket) => {
 			specNo: number,
 			isShirtSelected: boolean = true,
 			isPantSelected: boolean = true,
-			isSpecSelected: boolean = true
+			isSpecSelected: boolean = true,
+			isSkeletonShown: boolean = true
 		) => {
 			streamerSocket.emit(
 				'videoFrameRaw',
@@ -96,6 +97,7 @@ socketIoServer.on('connection', (socket) => {
 				isShirtSelected,
 				isPantSelected,
 				isSpecSelected,
+				isSkeletonShown,
 				sessionId
 			);
 		}
