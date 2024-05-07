@@ -11,7 +11,9 @@ from PIL import Image
 import  cvzone
 from minio import Minio
 import mediapipe as mp
+import gc
 
+mp_pose = mp.solutions.pose
 # BGRA
 ALPHA_CHANNEL_IDX = 3
 
@@ -53,9 +55,9 @@ def getMinioProduct(productType, productNo):
 # Format:
 # (ProductType, ProductNo) -> (ProductImage, ClothMask, NonClothMask)
 productMap = {}
- 
-mp_pose = mp.solutions.pose
-pose = mp_pose.Pose(static_image_mode=False, min_detection_confidence=0.5, min_tracking_confidence=0.5)       
+
+poseMapper = {}
+     
         
 def getProduct(productType, productNo):
 
@@ -110,7 +112,7 @@ def getSpec(specNo):
     return getProduct(SPEC_TYPE, specNo)
 
     
-def predict(shirtNo, pantNo, specNo,  base64Image, isShirtSelected, isPantSelected, isSpecSelected, isSkeletonShown):
+def predict(shirtNo, pantNo, specNo,  base64Image, isShirtSelected, isPantSelected, isSpecSelected, isSkeletonShown, pose):
 
     try:
         sbuf = StringIO()
@@ -148,7 +150,7 @@ def predict(shirtNo, pantNo, specNo,  base64Image, isShirtSelected, isPantSelect
         faces=face_cascade.detectMultiScale(gray,1.3,5)
         
         if len(faces) == 0:
-            return base64Image
+            return base64Image  
         
         # Detect skeloton Pose using mediaPipe
         results = pose.process(rgbImg)
@@ -433,9 +435,17 @@ def predict(shirtNo, pantNo, specNo,  base64Image, isShirtSelected, isPantSelect
 
 @socketio.on('videoFrameRaw')
 def handleFromFromFe(data, shirtno, pantno, specNo, isShirtSelected, isPantSelected, isSpecSelected, isSkeletonShown, sessionId):
-    
+    alreadyExists = poseMapper.get(sessionId)
+    if alreadyExists is None:
+        # print('Creating new pose object for session:', sessionId)
+        # model complexity 0 is the fastest, available options are 0, 1, 2
+        pose = mp_pose.Pose(static_image_mode=False, min_detection_confidence=0.5, min_tracking_confidence=0.5, model_complexity=0) 
+        poseMapper[sessionId] = pose
+    else:
+        # print('Using existing pose object for session:', sessionId)
+        pass
     sessionIdStr = str(sessionId)
-    processedFrame = predict(shirtno, pantno, specNo, data, isShirtSelected, isPantSelected, isSpecSelected, isSkeletonShown)
+    processedFrame = predict(shirtno, pantno, specNo, data, isShirtSelected, isPantSelected, isSpecSelected, isSkeletonShown, poseMapper[sessionId])
     emit('videoFrameProcessed', (processedFrame, sessionIdStr))
 
 @socketio.on('PING')
@@ -443,9 +453,28 @@ def handlerPing(sessionId):
     print('PING received at streamer')
     sessionIdStr = str(sessionId)
     emit('PONG', sessionIdStr)
+    
+@socketio.on('client-disconnect')
+def handlerClientDisconnect(sessionId):
+    sessionIdStr = str(sessionId)
+    print(f'client {sessionIdStr} disconnected at streamer')
+    
+    if sessionId in poseMapper:
+        print('Deleting pose object for session:', sessionId)
+        del poseMapper[sessionId]
+        
+    print("deleting all cached products")
+    productMap.clear()
+        
+    
+    collected = gc.collect()
+    print(f'Garbage collector: collected {collected} objects')
 
 
 def serverRun():
+    
+    # this is a dummy pose object to preload the model
+    mp_pose.Pose(static_image_mode=False, min_detection_confidence=0.5, min_tracking_confidence=0.5, model_complexity=1) 
     socketio.run(app, host='0.0.0.0',debug=True,port=5000, allow_unsafe_werkzeug=True)
     
 def manualRun():

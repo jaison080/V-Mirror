@@ -74,6 +74,7 @@ socketIoServer.on('connection', (socket) => {
 	socket.on('disconnect', () => {
 		console.log(`[socket]: ${sessionId} disconnected`);
 		sessionMap.delete(sessionId);
+		streamerSocket.emit('client-disconnect', sessionId);
 	});
 
 	socket.on(

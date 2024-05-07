@@ -16,6 +16,7 @@ export default function VideoStreamer() {
     NodeJS.Timer | undefined
   >(undefined);
   const [showSkeleton, setShowSkeleton] = useState<boolean>(true);
+  const showSkeletonRef = useRef<boolean>(true);
 
   const navigate = useNavigate();
   const {
@@ -85,6 +86,7 @@ export default function VideoStreamer() {
     const pantno = pants.indexOf(selectedPant as IProduct) + 1;
     const specno = specs.indexOf(selectedSpec as IProduct) + 1;
 
+    // console.log("showSkeleton", showSkeletonRef.current)
     if (socket.connected) {
       // socket.emit('videoFrameRaw', "TESTRAW");
       socket.emit(
@@ -96,7 +98,7 @@ export default function VideoStreamer() {
         isShirtSelected,
         isPantSelected,
         isSpecSelected,
-        showSkeleton
+        showSkeletonRef.current
       );
     }
   }
@@ -122,7 +124,7 @@ export default function VideoStreamer() {
       setStreamVideoToServerTimer(
         setInterval(() => {
           streamVideoToServer();
-        }, 300)
+        }, 200)
       );
 
       setStream(stream);
@@ -160,6 +162,13 @@ export default function VideoStreamer() {
   }
 
   useEffect(() => {
+    try {
+      if (streamVideoToServerTimer) {
+        clearInterval(streamVideoToServerTimer);
+      }
+    } catch (err) {
+      console.log(err);
+    }
     startStreaming();
     return () => {
       socket.off("connect", onConnect);
@@ -296,7 +305,11 @@ export default function VideoStreamer() {
                 size="lg"
                 colorScheme="blue"
                 isChecked={showSkeleton}
-                onChange={() => setShowSkeleton(!showSkeleton)}
+                // onClick={() => setShowSkeleton(!showSkeleton)}
+                onChange={() => setShowSkeleton((prev) => {
+                  showSkeletonRef.current = !prev;
+                  return !prev;
+                })}
               />
             </div>
           </div>
