@@ -13,6 +13,14 @@ from minio import Minio
 import mediapipe as mp
 import gc
 
+isInitialized = False
+mpPoseArgs = {
+    'static_image_mode': False,
+    'min_detection_confidence': 0.5,
+    'min_tracking_confidence': 0.5,
+    'model_complexity': 0
+}
+
 mp_pose = mp.solutions.pose
 # BGRA
 ALPHA_CHANNEL_IDX = 3
@@ -435,18 +443,26 @@ def predict(shirtNo, pantNo, specNo,  base64Image, isShirtSelected, isPantSelect
 
 @socketio.on('videoFrameRaw')
 def handleFromFromFe(data, shirtno, pantno, specNo, isShirtSelected, isPantSelected, isSpecSelected, isSkeletonShown, sessionId):
-    alreadyExists = poseMapper.get(sessionId)
-    if alreadyExists is None:
-        # print('Creating new pose object for session:', sessionId)
-        # model complexity 0 is the fastest, available options are 0, 1, 2
-        pose = mp_pose.Pose(static_image_mode=False, min_detection_confidence=0.5, min_tracking_confidence=0.5, model_complexity=0) 
-        poseMapper[sessionId] = pose
-    else:
-        # print('Using existing pose object for session:', sessionId)
-        pass
-    sessionIdStr = str(sessionId)
-    processedFrame = predict(shirtno, pantno, specNo, data, isShirtSelected, isPantSelected, isSpecSelected, isSkeletonShown, poseMapper[sessionId])
-    emit('videoFrameProcessed', (processedFrame, sessionIdStr))
+    try:
+        if not isInitialized:
+            print('Model not initialized yet')
+            return data
+        
+        alreadyExists = poseMapper.get(sessionId)
+        if alreadyExists is None:
+            # print('Creating new pose object for session:', sessionId)
+            # model complexity 0 is the fastest, available options are 0, 1, 2
+            pose = mp_pose.Pose(static_image_mode=mpPoseArgs['static_image_mode'], min_detection_confidence=mpPoseArgs['min_detection_confidence'], min_tracking_confidence=mpPoseArgs['min_tracking_confidence'], model_complexity=mpPoseArgs['model_complexity'])
+            poseMapper[sessionId] = pose
+        else:
+            # print('Using existing pose object for session:', sessionId)
+            pass
+        sessionIdStr = str(sessionId)
+        processedFrame = predict(shirtno, pantno, specNo, data, isShirtSelected, isPantSelected, isSpecSelected, isSkeletonShown, poseMapper[sessionId])
+        emit('videoFrameProcessed', (processedFrame, sessionIdStr))
+    except Exception as e:
+        print('Error in handleFromFromFe', e)
+        return data
 
 @socketio.on('PING')
 def handlerPing(sessionId):
@@ -470,11 +486,23 @@ def handlerClientDisconnect(sessionId):
     collected = gc.collect()
     print(f'Garbage collector: collected {collected} objects')
 
+def dummmyInitModel():
+    global isInitialized
+    
+    isInitialized = False
+    mp_pose.Pose(static_image_mode=False, min_detection_confidence=0.5, min_tracking_confidence=0.5, model_complexity=0)
+    mp_pose.Pose(static_image_mode=False, min_detection_confidence=0.5, min_tracking_confidence=0.5, model_complexity=1)
+    mp_pose.Pose(static_image_mode=False, min_detection_confidence=0.5, min_tracking_confidence=0.5, model_complexity=2)
+    # mp_pose.Pose(static_image_mode=mpPoseArgs['static_image_mode'], min_detection_confidence=mpPoseArgs['min_detection_confidence'], min_tracking_confidence=mpPoseArgs['min_tracking_confidence'], model_complexity=mpPoseArgs['model_complexity'])
+                #  , min_detection_confidence=0.5, min_tracking_confidence=0.5, model_complexity=1)
+    isInitialized = True
+    print('Model initialized')
 
 def serverRun():
     
     # this is a dummy pose object to preload the model
-    mp_pose.Pose(static_image_mode=False, min_detection_confidence=0.5, min_tracking_confidence=0.5, model_complexity=1) 
+    dummmyInitModel()
+    # mp_pose.Pose(static_image_mode=False, min_detection_confidence=0.5, min_tracking_confidence=0.5, model_complexity=1) 
     socketio.run(app, host='0.0.0.0',debug=True,port=5000, allow_unsafe_werkzeug=True)
     
 def manualRun():
@@ -578,5 +606,7 @@ if __name__ == '__main__':
             serverRun()
         elif sys.argv[1] == 'image':
             showImage()
+        elif sys.argv[1] == 'initModel':
+            dummmyInitModel()
     else:
         serverRun()

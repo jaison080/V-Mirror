@@ -18,5 +18,9 @@ COPY ./static /app/static
 
 WORKDIR /app
 
+# COPY ./downloadModel.py ./downloadModel.py
+
+RUN python3 ./streamer.py initModel
+
 # CMD ["sleep", "infinity"]
 CMD ["python3", "-u", "streamer.py"]
