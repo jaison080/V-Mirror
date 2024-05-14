@@ -32,9 +32,9 @@ model Products {
   createdAt DateTime @default(now())
 
 
-  // SHIRT = 0
-  // PANT = 1
-  // SPECS = 2
+  // SHIRT = 1
+  // PANT = 2
+  // SPECS = 3
   type Int
   id Int
   

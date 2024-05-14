@@ -500,7 +500,7 @@ def manualRun():
 
 def showImage():
     
-    img = cv2.imread('./static/assets/shirts/shirt1.png', cv2.IMREAD_UNCHANGED)
+    img = cv2.imread('./static/assets/shirts/1.png', cv2.IMREAD_UNCHANGED)
     print(img)
     print(img.shape)
     
